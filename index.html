@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>你的名字｜个人主页</title>
+    <meta
+      name="description"
+      content="你的名字的个人主页：简介、项目、技能、联系方式。"
+    />
+
+    <!-- Open Graph (可按需填写更准确的信息) -->
+    <meta property="og:title" content="你的名字｜个人主页" />
+    <meta
+      property="og:description"
+      content="简介、项目、技能、联系方式。"
+    />
+    <meta property="og:type" content="website" />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header" id="top">
+      <div class="container header-inner">
+        <a class="brand" href="#top" aria-label="返回顶部">
+          <span class="brand-mark" aria-hidden="true">◇</span>
+          <span class="brand-text">你的名字</span>
+        </a>
+
+        <nav class="nav" aria-label="主导航">
+          <a class="nav-link" href="#about">关于</a>
+          <a class="nav-link" href="#projects">项目</a>
+          <a class="nav-link" href="#skills">技能</a>
+          <a class="nav-link" href="#contact">联系</a>
+        </nav>
+
+        <div class="header-actions">
+          <button
+            class="icon-button"
+            type="button"
+            id="themeToggle"
+            aria-label="切换主题"
+            title="切换主题"
+          >
+            <span class="icon" aria-hidden="true">◐</span>
+          </button>
+          <a class="button primary" href="#contact">合作 / 交流</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-left">
+            <p class="eyebrow">你好，我是</p>
+            <h1 class="hero-title">
+              你的名字
+              <span class="hero-sub">前端 / 全栈开发者</span>
+            </h1>
+            <p class="hero-desc">
+              我专注于把复杂问题做成简单好用的产品：偏好清晰的信息架构、可维护的工程实践和扎实的性能体验。
+            </p>
+
+            <div class="hero-cta">
+              <a class="button primary" href="#projects">查看项目</a>
+              <a class="button" href="#about">了解更多</a>
+            </div>
+
+            <div class="social-row" aria-label="社交链接">
+              <a class="chip" href="https://github.com/yourname" target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+              <a class="chip" href="https://www.linkedin.com/in/yourname" target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
+              <a class="chip" href="https://your.blog" target="_blank" rel="noreferrer">
+                Blog
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-right" aria-hidden="true">
+            <div class="avatar-card">
+              <div class="avatar">
+                <svg
+                  viewBox="0 0 120 120"
+                  width="120"
+                  height="120"
+                  role="img"
+                  aria-label="头像占位图"
+                >
+                  <defs>
+                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="var(--accent)" stop-opacity="0.95" />
+                      <stop offset="1" stop-color="var(--accent2)" stop-opacity="0.95" />
+                    </linearGradient>
+                  </defs>
+                  <rect x="6" y="6" width="108" height="108" rx="24" fill="url(#g)" />
+                  <path
+                    d="M40 78c8 10 32 10 40 0"
+                    fill="none"
+                    stroke="rgba(255,255,255,.9)"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="46" cy="52" r="6" fill="rgba(255,255,255,.9)" />
+                  <circle cx="74" cy="52" r="6" fill="rgba(255,255,255,.9)" />
+                </svg>
+              </div>
+              <div class="avatar-meta">
+                <div class="avatar-name">你的名字</div>
+                <div class="avatar-role">Building delightful software</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-bg" aria-hidden="true"></div>
+      </section>
+
+      <section class="section" id="about">
+        <div class="container">
+          <div class="section-head">
+            <h2>关于我</h2>
+            <p>
+              用一段话说明你的定位与优势（领域、年限、擅长、偏好方向等）。这里可以写你的价值主张，
+              例如：从 0 到 1、增长、性能优化、工程化、可视化、AI 应用等。
+            </p>
+          </div>
+
+          <div class="grid two">
+            <div class="card">
+              <h3>我正在做的事</h3>
+              <ul class="list">
+                <li>构建 Web 应用与设计系统</li>
+                <li>关注性能、可访问性与工程质量</li>
+                <li>写作与分享：记录踩坑与方法论</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>我想要的合作</h3>
+              <ul class="list">
+                <li>产品原型 / MVP 开发</li>
+                <li>现有项目的重构、性能与体验优化</li>
+                <li>技术咨询：架构、规范、落地方案</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="projects">
+        <div class="container">
+          <div class="section-head">
+            <h2>项目</h2>
+            <p>把最能代表你的 3–6 个作品放在这里：一句话价值 + 关键技术栈 + 链接。</p>
+          </div>
+
+          <div class="toolbar">
+            <div class="hint">提示：项目列表可在 <code>script.js</code> 里配置。</div>
+          </div>
+
+          <div class="grid three" id="projectGrid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="section" id="skills">
+        <div class="container">
+          <div class="section-head">
+            <h2>技能</h2>
+            <p>用“可验证”的方式展示能力：做过什么、怎么做、效果如何。</p>
+          </div>
+
+          <div class="grid three">
+            <div class="card">
+              <h3>前端</h3>
+              <div class="tag-row">
+                <span class="tag">TypeScript</span>
+                <span class="tag">React</span>
+                <span class="tag">Next.js</span>
+                <span class="tag">Vite</span>
+                <span class="tag">CSS</span>
+                <span class="tag">a11y</span>
+              </div>
+            </div>
+            <div class="card">
+              <h3>后端 / 云</h3>
+              <div class="tag-row">
+                <span class="tag">Node.js</span>
+                <span class="tag">REST</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Redis</span>
+                <span class="tag">Docker</span>
+              </div>
+            </div>
+            <div class="card">
+              <h3>工程化</h3>
+              <div class="tag-row">
+                <span class="tag">CI/CD</span>
+                <span class="tag">Lint</span>
+                <span class="tag">Testing</span>
+                <span class="tag">Monorepo</span>
+                <span class="tag">Perf</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="contact">
+        <div class="container">
+          <div class="section-head">
+            <h2>联系</h2>
+            <p>最简单的方式：发邮件或在社交平台私信。欢迎交流想法、合作或机会。</p>
+          </div>
+
+          <div class="grid two">
+            <div class="card">
+              <h3>邮箱</h3>
+              <p class="muted">
+                <a id="emailLink" href="mailto:you@example.com">you@example.com</a>
+              </p>
+              <div class="row">
+                <button class="button" type="button" id="copyEmailBtn">复制邮箱</button>
+                <a class="button primary" href="mailto:you@example.com">发送邮件</a>
+              </div>
+              <p class="tiny muted" id="copyStatus" role="status" aria-live="polite"></p>
+            </div>
+
+            <div class="card">
+              <h3>简历 / 资料</h3>
+              <p class="muted">
+                你可以放一个 PDF 或在线简历链接（例如 Notion、个人博客、GitHub README、语雀等）。
+              </p>
+              <div class="row">
+                <a class="button" href="https://github.com/yourname" target="_blank" rel="noreferrer">GitHub</a>
+                <a class="button" href="https://your.blog" target="_blank" rel="noreferrer">博客</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="muted">
+          © <span id="year"></span> 你的名字 · Built with plain HTML/CSS/JS
+        </div>
+        <button class="icon-button" type="button" id="backToTop" aria-label="返回顶部" title="返回顶部">
+          ↑
+        </button>
+      </div>
+    </footer>
+
+    <noscript>
+      <div class="noscript">
+        你已禁用 JavaScript：页面依然可用，但主题切换/复制邮箱/返回顶部等功能不可用。
+      </div>
+    </noscript>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "你的名字",
+        "jobTitle": "Software Engineer",
+        "url": "",
+        "sameAs": ["https://github.com/yourname", "https://www.linkedin.com/in/yourname"]
+      }
+    </script>
+    <script src="./script.js" defer></script>
+  </body>
+</html>
