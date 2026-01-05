@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bairong IndexHub - 资产管理与治理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background-color: #f1f5f9;
+        color: #0f172a;
+      }
+
+      /* 侧边栏样式 */
+      .admin-sidebar {
+        width: 240px;
+        background: #0f172a;
+        color: #94a3b8;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        transition: width 0.3s;
+      }
+      .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        cursor: pointer;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        font-size: 14px;
+      }
+      .menu-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #f8fafc;
+      }
+      .menu-item.active {
+        background: #1e293b;
+        color: #fff;
+        border-left-color: #6366f1;
+      }
+      .menu-header {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        padding: 20px 20px 8px;
+        font-weight: 600;
+      }
+
+      /* 状态徽章 */
+      .status-badge {
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .status-online {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+      }
+      .status-offline {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+      }
+      .status-review {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+
+      /* 维度标签选择器 (核心交互) */
+      .dim-tag {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+      }
+      .dim-tag.enabled {
+        background: #e0e7ff;
+        color: #4338ca;
+        border-color: #c7d2fe;
+      }
+      .dim-tag.disabled {
+        background: #f1f5f9;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        text-decoration: line-through;
+      }
+      .dim-tag:hover {
+        transform: translateY(-1px);
+      }
+
+      /* 抽屉 */
+      .drawer-mask {
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px);
+        transition: opacity 0.3s;
+      }
+      .drawer-panel {
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .drawer-open .drawer-panel {
+        transform: translateX(0);
+      }
+      .drawer-open .drawer-mask {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* 滚动条 */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body class="h-screen flex overflow-hidden">
+    <aside class="admin-sidebar">
+      <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2 mb-2">
+        <div
+          class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/30"
+        >
+          A
+        </div>
+        <div>
+          <div class="text-white font-bold text-base">Index Admin</div>
+          <div class="text-[10px] text-gray-500">Governance Portal V9</div>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-2">
+        <div class="menu-header">Overview</div>
+        <div class="menu-item"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> 治理大盘</div>
+
+        <div class="menu-header">Asset Management</div>
+        <div class="menu-item active"><i data-lucide="database" class="w-4 h-4"></i> 指标注册与维护</div>
+        <div class="menu-item"><i data-lucide="git-branch" class="w-4 h-4"></i> 维度与分类树</div>
+        <div class="menu-item"><i data-lucide="tag" class="w-4 h-4"></i> 语义约束配置</div>
+
+        <div class="menu-header">Operations</div>
+        <div class="menu-item flex justify-between">
+          <span class="flex gap-3 items-center"
+            ><i data-lucide="activity" class="w-4 h-4"></i> 热度与健康度</span
+          >
+        </div>
+        <div class="menu-item flex justify-between">
+          <span class="flex gap-3 items-center"
+            ><i data-lucide="alert-triangle" class="w-4 h-4"></i> 僵尸资产治理</span
+          >
+          <span class="bg-red-500 text-white text-[10px] px-1.5 rounded-full">12</span>
+        </div>
+
+        <div class="menu-header">Security</div>
+        <div class="menu-item"><i data-lucide="shield" class="w-4 h-4"></i> 权限审批流</div>
+        <div class="menu-item"><i data-lucide="key" class="w-4 h-4"></i> API 网关监控</div>
+      </div>
+
+      <div class="p-4 border-t border-gray-800">
+        <div class="flex items-center gap-3">
+          <img
+            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin"
+            class="w-8 h-8 rounded-full bg-gray-700"
+            alt="Admin avatar"
+          />
+          <div class="overflow-hidden">
+            <div class="text-xs text-white font-medium truncate">Admin User</div>
+            <div class="text-[10px] text-gray-500 truncate">Data Governance Team</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 bg-slate-50">
+      <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0 z-10">
+        <div class="flex items-center gap-4">
+          <h1 class="text-lg font-bold text-gray-800">指标全生命周期管理</h1>
+          <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-md border border-gray-200"
+            >共 5,420 个资产</span
+          >
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+          >
+            <i data-lucide="plus" class="w-4 h-4"></i> 注册新指标
+          </button>
+        </div>
+      </header>
+
+      <div class="px-8 py-6 grid grid-cols-4 gap-6 flex-shrink-0">
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="text-xs text-gray-500 uppercase font-semibold mb-1">SLA 达标率 (今日)</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-gray-900">99.8%</div>
+            <div class="text-xs text-green-600 flex items-center">
+              <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +0.2%
+            </div>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="text-xs text-gray-500 uppercase font-semibold mb-1">活跃 API Token</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-gray-900">4,102</div>
+            <div class="text-xs text-gray-400">Total</div>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 border-l-red-500">
+          <div class="text-xs text-gray-500 uppercase font-semibold mb-1">待治理僵尸指标</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-red-600">85</div>
+            <div class="text-xs text-red-500 cursor-pointer hover:underline">立即清理 -&gt;</div>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="text-xs text-gray-500 uppercase font-semibold mb-1">平均健康分</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-indigo-600">92.4</div>
+            <div class="w-16 h-8"><canvas id="sparkline"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 px-8 pb-8 overflow-hidden flex flex-col">
+        <div class="bg-white border border-gray-200 rounded-xl flex flex-col h-full shadow-sm">
+          <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+            <div class="flex gap-3">
+              <div class="relative w-64">
+                <i
+                  data-lucide="search"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                ></i>
+                <input
+                  type="text"
+                  placeholder="搜索指标 Code / 名称..."
+                  class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <select class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-600 outline-none">
+                <option>所有业务域</option>
+                <option>智能风控域</option>
+                <option>精准营销域</option>
+              </select>
+              <select class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-600 outline-none">
+                <option>所有状态</option>
+                <option>已上线</option>
+                <option>待发布</option>
+                <option>已下线</option>
+              </select>
+            </div>
+            <div class="flex gap-2">
+              <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                <i data-lucide="download" class="w-4 h-4"></i>
+              </button>
+              <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th class="py-3 px-4 text-xs font-semibold text-gray-500 uppercase w-10">
+                    <input type="checkbox" class="rounded border-gray-300" />
+                  </th>
+                  <th class="py-3 px-4 text-xs font-semibold text-gray-500 uppercase w-64">资产信息</th>
+                  <th class="py-3 px-4 text-xs font-semibold text-gray-500 uppercase">业务域/Owner</th>
+                  <th class="py-3 px-4 text-xs font-semibold text-gray-500 uppercase">健康度/热度</th>
+                  <th class="py-3 px-4 text-xs font-semibold text-gray-500 uppercase">状态</th>
+                  <th class="py-3 px-4 text-xs font-semibold text-gray-500 uppercase w-32">治理操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 text-sm" id="admin-table-body"></tbody>
+            </table>
+          </div>
+
+          <div
+            class="p-3 border-t border-gray-200 bg-gray-50 flex justify-between items-center text-xs text-gray-500 rounded-b-xl"
+          >
+            <span>Showing 1-15 of 5,420 items</span>
+            <div class="flex gap-1">
+              <button class="px-2 py-1 border rounded bg-white hover:bg-gray-50 disabled:opacity-50">Prev</button>
+              <button class="px-2 py-1 border rounded bg-white hover:bg-gray-50">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="edit-drawer" class="fixed inset-0 z-50 pointer-events-none flex justify-end">
+      <div onclick="closeDrawer()" class="drawer-mask absolute inset-0 opacity-0 pointer-events-none"></div>
+      <div class="drawer-panel w-[640px] bg-white h-full shadow-2xl flex flex-col pointer-events-auto">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">编辑资产配置</h2>
+            <div class="text-xs text-gray-500 font-mono mt-1" id="drawer-code">CODE_PLACEHOLDER</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="status-badge status-online">Online</span>
+            <button onclick="closeDrawer()" class="p-2 hover:bg-gray-200 rounded-full">
+              <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-8">
+          <section>
+            <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div class="w-1 h-4 bg-indigo-600 rounded"></div>
+              基础元数据
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">指标显示名</label>
+                <input type="text" value="API 峰值 QPS" class="w-full text-sm border-gray-300 rounded-lg bg-gray-50 border p-2" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">认证等级</label>
+                <select class="w-full text-sm border-gray-300 rounded-lg bg-white border p-2">
+                  <option>P0 核心</option>
+                  <option>P1 通用</option>
+                </select>
+              </div>
+              <div class="col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1">业务口径描述</label>
+                <textarea class="w-full text-sm border-gray-300 rounded-lg bg-gray-50 border p-2 h-20">
+统计周期内，数据查询接口每秒最大并发请求数。</textarea
+                >
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div class="w-1 h-4 bg-indigo-600 rounded"></div>
+              技术绑定
+            </h3>
+            <div class="bg-slate-900 rounded-lg p-4 font-mono text-xs text-blue-300 border border-slate-700">
+              SELECT max(qps) FROM dwd_api_log WHERE dt = {date}
+            </div>
+          </section>
+
+          <section class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                维度兼容性矩阵 (Semantic)
+              </h3>
+              <span class="text-[10px] text-indigo-500">点击切换：蓝色=支持，划线=互斥</span>
+            </div>
+
+            <div class="space-y-3">
+              <div>
+                <span class="text-xs text-gray-500 block mb-2">时间维度 (必选)</span>
+                <div class="flex gap-2">
+                  <span class="px-3 py-1 rounded text-xs font-medium bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300"
+                    >统计日期 (Date)</span
+                  >
+                </div>
+              </div>
+
+              <div>
+                <span class="text-xs text-gray-500 block mb-2">公共维度 (点击配置)</span>
+                <div class="flex flex-wrap gap-2" id="dim-container">
+                  <span class="dim-tag px-3 py-1 rounded text-xs font-medium enabled" onclick="toggleDim(this)">银行客户 (Client)</span>
+                  <span class="dim-tag px-3 py-1 rounded text-xs font-medium enabled" onclick="toggleDim(this)">产品类型 (Product)</span>
+                  <span class="dim-tag px-3 py-1 rounded text-xs font-medium enabled" onclick="toggleDim(this)">调用区域 (Region)</span>
+                  <span class="dim-tag px-3 py-1 rounded text-xs font-medium disabled" onclick="toggleDim(this)">险种 (Insurance)</span>
+                  <span class="dim-tag px-3 py-1 rounded text-xs font-medium disabled" onclick="toggleDim(this)">模型版本 (Model Ver)</span>
+                  <span class="dim-tag px-3 py-1 rounded text-xs font-medium disabled" onclick="toggleDim(this)">手机品牌 (Brand)</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="pt-4 border-t border-gray-200">
+            <h3 class="text-sm font-bold text-red-600 mb-3">危险操作</h3>
+            <div class="flex gap-3">
+              <button class="px-3 py-1.5 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded text-xs font-medium">
+                下线指标 (Offline)
+              </button>
+              <button class="px-3 py-1.5 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded text-xs font-medium">回滚版本</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="p-4 border-t border-gray-200 bg-white flex justify-end gap-3">
+          <button onclick="closeDrawer()" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+          <button onclick="saveConfig(event)" class="px-4 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">
+            保存配置 & 发布
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      // 模拟后台数据
+      const adminData = [
+        { id: 1, name: "API 峰值 QPS", code: "srv_api_qps_peak", domain: "数据服务", owner: "张三", health: 98, heat: 14200, status: "online" },
+        { id: 2, name: "近30天借贷APP安装数", code: "rsk_app_install_30d", domain: "智能风控", owner: "李四", health: 95, heat: 8500, status: "online" },
+        { id: 3, name: "总保费规模 GWP", code: "mkt_gwp_total", domain: "精准营销", owner: "王五", health: 100, heat: 3200, status: "online" },
+        { id: 4, name: "历史逾期总金额", code: "rsk_ovd_amt_hist", domain: "智能风控", owner: "赵六", health: 60, heat: 0, status: "offline" }, // Zombie
+        { id: 5, name: "客户身份证二要素", code: "srv_id_verify_2e", domain: "数据服务", owner: "张三", health: 99, heat: 45000, status: "online" },
+        { id: 6, name: "新客转化率", code: "mkt_cvr_new", domain: "精准营销", owner: "钱七", health: 88, heat: 120, status: "review" }
+      ];
+
+      // 渲染表格
+      function renderTable() {
+        const tbody = document.getElementById("admin-table-body");
+        tbody.innerHTML = adminData
+          .map((row) => {
+            let statusClass = "";
+            let statusText = "";
+            if (row.status === "online") {
+              statusClass = "status-online";
+              statusText = "已上线";
+            } else if (row.status === "offline") {
+              statusClass = "status-offline";
+              statusText = "已下线";
+            } else {
+              statusClass = "status-review";
+              statusText = "待发布";
+            }
+
+            // 健康分颜色
+            const healthColor = row.health >= 90 ? "text-green-600" : row.health >= 60 ? "text-yellow-600" : "text-red-600";
+            const heatBarWidth = Math.min(row.heat / 500, 100);
+
+            return `
+              <tr class="hover:bg-gray-50 group transition-colors">
+                  <td class="py-3 px-4"><input type="checkbox" class="rounded border-gray-300"></td>
+                  <td class="py-3 px-4">
+                      <div class="font-bold text-gray-900 group-hover:text-indigo-600 cursor-pointer" onclick="openDrawer('${row.code}', '${row.name}')">${row.name}</div>
+                      <div class="font-mono text-[10px] text-gray-400 mt-0.5">${row.code}</div>
+                  </td>
+                  <td class="py-3 px-4">
+                      <div class="text-xs text-gray-700">${row.domain}</div>
+                      <div class="text-[10px] text-gray-400">Owner: ${row.owner}</div>
+                  </td>
+                  <td class="py-3 px-4">
+                      <div class="flex items-center gap-2 mb-1">
+                          <span class="text-xs font-bold ${healthColor}">${row.health}分</span>
+                          <div class="h-1 w-12 bg-gray-200 rounded-full overflow-hidden">
+                              <div class="h-full bg-indigo-500" style="width: ${heatBarWidth}%"></div>
+                          </div>
+                      </div>
+                      <div class="text-[10px] text-gray-400">${row.heat.toLocaleString()} Calls</div>
+                  </td>
+                  <td class="py-3 px-4">
+                      <span class="status-badge ${statusClass}">
+                          <div class="w-1.5 h-1.5 rounded-full bg-current"></div>${statusText}
+                      </span>
+                  </td>
+                  <td class="py-3 px-4">
+                      <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button class="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded" title="编辑" onclick="openDrawer('${row.code}', '${row.name}')"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                          <button class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded" title="下线"><i data-lucide="power" class="w-4 h-4"></i></button>
+                          <button class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="血缘"><i data-lucide="git-branch" class="w-4 h-4"></i></button>
+                      </div>
+                  </td>
+              </tr>
+              `;
+          })
+          .join("");
+        lucide.createIcons();
+      }
+
+      // 维度配置交互 (核心治理功能)
+      function toggleDim(el) {
+        if (el.classList.contains("enabled")) {
+          el.classList.remove("enabled");
+          el.classList.add("disabled");
+        } else {
+          el.classList.remove("disabled");
+          el.classList.add("enabled");
+        }
+      }
+
+      // 抽屉交互
+      function openDrawer(code) {
+        document.getElementById("edit-drawer").classList.add("drawer-open");
+        document.getElementById("drawer-code").innerText = code;
+        // 此处应填充更多详情数据
+      }
+
+      function closeDrawer() {
+        document.getElementById("edit-drawer").classList.remove("drawer-open");
+      }
+
+      function saveConfig(ev) {
+        // 模拟保存动画
+        const btn = ev?.currentTarget;
+        const originalText = btn?.innerText ?? "保存配置 & 发布";
+        if (btn) btn.innerText = "Saving...";
+        setTimeout(() => {
+          if (btn) btn.innerText = originalText;
+          closeDrawer();
+          alert("配置已保存，维度约束规则已同步至前台查询引擎。");
+        }, 800);
+      }
+
+      // 初始化 Sparkline 图表 (Dashboard)
+      const ctx = document.getElementById("sparkline").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [1, 2, 3, 4, 5, 6, 7],
+          datasets: [{ data: [90, 91, 93, 92, 94, 95, 92], borderColor: "#6366F1", borderWidth: 2, pointRadius: 0, tension: 0.4 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+      });
+
+      renderTable();
+    </script>
+  </body>
+</html>
